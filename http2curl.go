@@ -9,6 +9,12 @@ import (
 	"strings"
 )
 
+type CurlOptions struct {
+	FollowRedirects      bool
+	PrintResponseHeaders bool
+	Verbose              bool
+}
+
 // CurlCommand contains exec.Command compatible slice + helpers
 type CurlCommand []string
 
@@ -27,7 +33,7 @@ func bashEscape(str string) string {
 }
 
 // GetCurlCommand returns a CurlCommand corresponding to an http.Request
-func GetCurlCommand(req *http.Request, followRedirects bool) (*CurlCommand, error) {
+func GetCurlCommand(req *http.Request, curlOptions CurlOptions) (*CurlCommand, error) {
 	if req.URL == nil {
 		return nil, fmt.Errorf("getCurlCommand: invalid request, req.URL is nil")
 	}
@@ -50,8 +56,16 @@ func GetCurlCommand(req *http.Request, followRedirects bool) (*CurlCommand, erro
 		command.append("-k")
 	}
 
-	if followRedirects {
+	if curlOptions.FollowRedirects {
 		command.append("-L")
+	}
+
+	if curlOptions.PrintResponseHeaders && !curlOptions.Verbose {
+		command.append("--head")
+	}
+
+	if curlOptions.Verbose {
+		command.append("-v")
 	}
 
 	command.append("-X", bashEscape(req.Method))

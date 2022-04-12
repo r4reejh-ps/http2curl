@@ -27,7 +27,7 @@ func bashEscape(str string) string {
 }
 
 // GetCurlCommand returns a CurlCommand corresponding to an http.Request
-func GetCurlCommand(req *http.Request) (*CurlCommand, error) {
+func GetCurlCommand(req *http.Request, followRedirects bool) (*CurlCommand, error) {
 	if req.URL == nil {
 		return nil, fmt.Errorf("getCurlCommand: invalid request, req.URL is nil")
 	}
@@ -48,6 +48,10 @@ func GetCurlCommand(req *http.Request) (*CurlCommand, error) {
 
 	if schema == "https" {
 		command.append("-k")
+	}
+
+	if followRedirects {
+		command.append("-L")
 	}
 
 	command.append("-X", bashEscape(req.Method))
@@ -81,4 +85,3 @@ func GetCurlCommand(req *http.Request) (*CurlCommand, error) {
 
 	return &command, nil
 }
-

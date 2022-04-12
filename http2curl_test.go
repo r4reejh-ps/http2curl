@@ -21,7 +21,7 @@ func ExampleGetCurlCommand() {
 	req, _ := http.NewRequest(http.MethodPost, "http://foo.com/cats", ioutil.NopCloser(bytes.NewBufferString(body)))
 	req.Header.Set("API_KEY", "123")
 
-	command, _ := GetCurlCommand(req)
+	command, _ := GetCurlCommand(req, false)
 	fmt.Println(command)
 
 	// Output:
@@ -32,7 +32,7 @@ func ExampleGetCurlCommand_json() {
 	req, _ := http.NewRequest("PUT", "http://www.example.com/abc/def.ghi?jlk=mno&pqr=stu", bytes.NewBufferString(`{"hello":"world","answer":42}`))
 	req.Header.Set("Content-Type", "application/json")
 
-	command, _ := GetCurlCommand(req)
+	command, _ := GetCurlCommand(req, true)
 	fmt.Println(command)
 
 	// Output:
@@ -44,7 +44,7 @@ func ExampleGetCurlCommand_slice() {
 	req, _ := http.NewRequest("PUT", "http://www.example.com/abc/def.ghi?jlk=mno&pqr=stu", bytes.NewBufferString(`{"hello":"world","answer":42}`))
 	req.Header.Set("Content-Type", "application/json")
 
-	command, _ := GetCurlCommand(req)
+	command, _ := GetCurlCommand(req, true)
 	fmt.Println(strings.Join(*command, " \\\n  "))
 
 	// Output:
@@ -62,7 +62,7 @@ func ExampleGetCurlCommand_noBody() {
 	req, _ := http.NewRequest("PUT", "http://www.example.com/abc/def.ghi?jlk=mno&pqr=stu", nil)
 	req.Header.Set("Content-Type", "application/json")
 
-	command, _ := GetCurlCommand(req)
+	command, _ := GetCurlCommand(req, true)
 	fmt.Println(command)
 
 	// Output:
@@ -73,7 +73,7 @@ func ExampleGetCurlCommand_emptyStringBody() {
 	req, _ := http.NewRequest("PUT", "http://www.example.com/abc/def.ghi?jlk=mno&pqr=stu", bytes.NewBufferString(""))
 	req.Header.Set("Content-Type", "application/json")
 
-	command, _ := GetCurlCommand(req)
+	command, _ := GetCurlCommand(req, true)
 	fmt.Println(command)
 
 	// Output:
@@ -84,7 +84,7 @@ func ExampleGetCurlCommand_newlineInBody() {
 	req, _ := http.NewRequest("POST", "http://www.example.com/abc/def.ghi?jlk=mno&pqr=stu", bytes.NewBufferString("hello\nworld"))
 	req.Header.Set("Content-Type", "application/json")
 
-	command, _ := GetCurlCommand(req)
+	command, _ := GetCurlCommand(req, true)
 	fmt.Println(command)
 
 	// Output:
@@ -96,7 +96,7 @@ func ExampleGetCurlCommand_specialCharsInBody() {
 	req, _ := http.NewRequest("POST", "http://www.example.com/abc/def.ghi?jlk=mno&pqr=stu", bytes.NewBufferString(`Hello $123 o'neill -"-`))
 	req.Header.Set("Content-Type", "application/json")
 
-	command, _ := GetCurlCommand(req)
+	command, _ := GetCurlCommand(req, true)
 	fmt.Println(command)
 
 	// Output:
@@ -114,7 +114,7 @@ func ExampleGetCurlCommand_other() {
 	req.Header.Set("X-Auth-Token", "private-token")
 	req.Header.Set("Content-Type", "application/json")
 
-	command, err := GetCurlCommand(req)
+	command, err := GetCurlCommand(req, true)
 	if err != nil {
 		panic(err)
 	}
@@ -133,7 +133,7 @@ func ExampleGetCurlCommand_https() {
 	req.Header.Set("X-Auth-Token", "private-token")
 	req.Header.Set("Content-Type", "application/json")
 
-	command, err := GetCurlCommand(req)
+	command, err := GetCurlCommand(req, true)
 	if err != nil {
 		panic(err)
 	}
@@ -149,7 +149,7 @@ func BenchmarkGetCurlCommand(b *testing.B) {
 		form.Add("number", strconv.Itoa(i))
 		body := form.Encode()
 		req, _ := http.NewRequest(http.MethodPost, "http://foo.com", ioutil.NopCloser(bytes.NewBufferString(body)))
-		_, err := GetCurlCommand(req)
+		_, err := GetCurlCommand(req, true)
 		if err != nil {
 			panic(err)
 		}
@@ -158,7 +158,7 @@ func BenchmarkGetCurlCommand(b *testing.B) {
 
 func TestGetCurlCommand_serverSide(t *testing.T) {
 	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c, err := GetCurlCommand(r)
+		c, err := GetCurlCommand(r, true)
 		if err != nil {
 			t.Error(err)
 		}

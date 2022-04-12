@@ -61,7 +61,7 @@ func GetCurlCommand(req *http.Request, curlOptions CurlOptions) (*CurlCommand, e
 	}
 
 	if curlOptions.PrintResponseHeaders && !curlOptions.Verbose {
-		command.append("--head")
+		command.append("-s -D - -o")
 	}
 
 	if curlOptions.Verbose {

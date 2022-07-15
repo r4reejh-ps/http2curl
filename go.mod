@@ -1,4 +1,4 @@
-module github.com/r4reejh-ps/http2curl/v2
+module github.com/r4reejh-ps/http2curl
 
 go 1.13
 

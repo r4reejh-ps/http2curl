@@ -12,6 +12,7 @@ import (
 type CurlOptions struct {
 	FollowRedirects      bool
 	PrintResponseHeaders bool
+	PathAsIs             bool
 	Verbose              bool
 }
 
@@ -42,8 +43,6 @@ func GetCurlCommand(req *http.Request, curlOptions CurlOptions) (*CurlCommand, e
 
 	command.append("curl")
 
-	command.append("--path-as-is")
-
 	schema := req.URL.Scheme
 	requestURL := req.URL.String()
 	if schema == "" {
@@ -56,6 +55,10 @@ func GetCurlCommand(req *http.Request, curlOptions CurlOptions) (*CurlCommand, e
 
 	if schema == "https" {
 		command.append("-k")
+	}
+
+	if curlOptions.PathAsIs {
+		command.append("--path-as-is")
 	}
 
 	if curlOptions.FollowRedirects {

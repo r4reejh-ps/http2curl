@@ -42,6 +42,8 @@ func GetCurlCommand(req *http.Request, curlOptions CurlOptions) (*CurlCommand, e
 
 	command.append("curl")
 
+	command.append("--path-as-is")
+
 	schema := req.URL.Scheme
 	requestURL := req.URL.String()
 	if schema == "" {
